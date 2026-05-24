@@ -1,0 +1,22 @@
+appId: com.personal.aoe4overlay
+productName: AoE4 Companion
+directories:
+  buildResources: resources
+  output: release
+files:
+  - out/**/*
+  - resources/**/*
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  target: dmg
+  icon: resources/icon.icns

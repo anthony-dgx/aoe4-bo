@@ -1,0 +1,37 @@
+{
+  "name": "aoe4-overlay",
+  "version": "1.0.0",
+  "description": "Porofessor-style companion app for Age of Empires 4",
+  "type": "module",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "pack:win": "electron-vite build && electron-builder --win --x64",
+    "pack:mac": "electron-vite build && electron-builder --mac"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "electron-store": "^10.0.0",
+    "framer-motion": "^11.18.2",
+    "ps-list": "^8.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.6"
+  },
+  "devDependencies": {
+    "@electron-toolkit/tsconfig": "^2.0.0",
+    "@electron-toolkit/utils": "^4.0.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "electron": "^34.3.0",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^3.1.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
+  }
+}
