@@ -30,12 +30,17 @@ declare global {
 
 function DragHandle() {
   return (
-    <div className="flex items-center justify-center py-1.5 cursor-grab active:cursor-grabbing" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
-      <div className="flex gap-0.5">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="w-1 h-1 rounded-full bg-white/20" />
+    <div
+      className="flex items-center justify-between px-3 py-2 rounded-t-xl bg-black/70 border border-white/10 cursor-grab active:cursor-grabbing select-none"
+      style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+    >
+      <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">AoE4</span>
+      <div className="flex gap-1">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="w-1 h-1 rounded-full bg-white/30" />
         ))}
       </div>
+      <span className="text-[10px] text-white/20">⠿ drag</span>
     </div>
   )
 }

@@ -21,14 +21,25 @@ app.on('ready', () => {
   const icon = nativeImage.createFromPath(join(__dirname, '../../resources/icon.png'))
   tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon)
   tray.setToolTip('AoE4 Companion')
-  tray.setContextMenu(
-    Menu.buildFromTemplate([
-      { label: 'Show Pre-game', click: () => showPregameWindow() },
-      { label: 'Toggle Overlay', click: () => overlayWin.isVisible() ? overlayWin.hide() : overlayWin.show() },
-      { type: 'separator' },
-      { label: 'Quit', click: () => app.quit() }
-    ])
-  )
+  const rebuildTray = () => {
+    tray!.setContextMenu(
+      Menu.buildFromTemplate([
+        { label: 'Show Pre-game', click: () => showPregameWindow() },
+        { label: 'Manual Game Setup', click: () => {
+          showPregameWindow()
+          setTimeout(() => {
+            if (!pregameWin.isDestroyed()) {
+              pregameWin.webContents.send('pregame:manual-mode')
+            }
+          }, 300)
+        }},
+        { label: 'Toggle Overlay', click: () => overlayWin.isVisible() ? overlayWin.hide() : overlayWin.show() },
+        { type: 'separator' },
+        { label: 'Quit', click: () => app.quit() }
+      ])
+    )
+  }
+  rebuildTray()
   tray.on('click', () => showPregameWindow())
 
   // Register IPC handlers
@@ -56,6 +67,16 @@ app.on('ready', () => {
   ipcMain.on('pregame:skip', () => {
     pregameWin.hide()
     overlayWin.show()
+  })
+
+  // Manual game: user selects civs themselves (custom games)
+  ipcMain.on('game:manual-start', (_e, state: GameState) => {
+    if (!pregameWin.isDestroyed()) {
+      pregameWin.webContents.send('game:started', state)
+    }
+    if (!overlayWin.isDestroyed()) {
+      overlayWin.webContents.send('game:started', state)
+    }
   })
 
   // Global hotkeys

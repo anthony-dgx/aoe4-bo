@@ -30,5 +30,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('tips:done', (_e, t) => cb(t))
   },
   startTracking: (buildId: string) => ipcRenderer.send('pregame:start-tracking', buildId),
-  skip: () => ipcRenderer.send('pregame:skip')
+  skip: () => ipcRenderer.send('pregame:skip'),
+  manualStart: (state: unknown) => ipcRenderer.send('game:manual-start', state),
+  onManualMode: (cb: () => void) => ipcRenderer.on('pregame:manual-mode', () => cb())
 })

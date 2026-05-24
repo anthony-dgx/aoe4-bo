@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { GameState, BuildOrder } from '../../shared/types'
 import { usePregameStore } from './store/usePregameStore'
@@ -7,6 +7,7 @@ import { CivMatchup } from './components/CivMatchup'
 import { BuildOrderPicker } from './components/BuildOrderPicker'
 import { MatchupTips } from './components/MatchupTips'
 import { SettingsDrawer } from './components/SettingsDrawer'
+import { ManualGameSetup } from './components/ManualGameSetup'
 
 // Extend window for TS
 declare global {
@@ -37,6 +38,8 @@ declare global {
       }
       startTracking: (buildId: string) => void
       skip: () => void
+      manualStart: (state: GameState) => void
+      onManualMode: (cb: () => void) => void
     }
   }
 }
@@ -50,6 +53,8 @@ function getOpponentPlayer(gameState: GameState) {
 }
 
 export default function App() {
+  const [manualMode, setManualMode] = useState(false)
+
   const {
     gameState,
     setGameState,
@@ -112,11 +117,17 @@ export default function App() {
     // Subscribe to game events
     window.electronAPI.game.onStarted((state) => {
       setGameState(state)
+      setManualMode(false)
       triggerTips(state)
     })
 
     window.electronAPI.game.onEnded((state) => {
       setGameState(state)
+    })
+
+    // Tray → "Manual Game Setup"
+    window.electronAPI.onManualMode(() => {
+      setManualMode(true)
     })
 
     init()
@@ -219,9 +230,21 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Idle state */}
-        <AnimatePresence>
-          {(!gameState || gameState.phase === 'idle') && (
+        {/* Idle state / Manual setup */}
+        <AnimatePresence mode="wait">
+          {manualMode ? (
+            <motion.div key="manual" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <ManualGameSetup
+                onStart={(state) => {
+                  window.electronAPI.manualStart(state)
+                  setGameState(state)
+                  setManualMode(false)
+                  triggerTips(state)
+                }}
+                onCancel={() => setManualMode(false)}
+              />
+            </motion.div>
+          ) : (!gameState || gameState.phase === 'idle') ? (
             <motion.div
               key="idle"
               initial={{ opacity: 0 }}
@@ -231,9 +254,15 @@ export default function App() {
             >
               <div className="text-3xl mb-2">⚔️</div>
               <p className="text-white/40 text-sm">Waiting for a game to start…</p>
-              <p className="text-white/25 text-xs mt-1">Launch AoE4 and queue up to get started.</p>
+              <p className="text-white/25 text-xs mt-1">Launch AoE4 and queue up, or set up manually below.</p>
+              <button
+                onClick={() => setManualMode(true)}
+                className="mt-3 px-4 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                Manual Game Setup
+              </button>
             </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
 
         {/* Build Order Picker */}
